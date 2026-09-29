@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>목자와 양 2인 1조 큐티 칭찬 스티커판 🐑✨</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Gowun Dodum & Noto Sans KR) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cozy: {
+                            bg: '#FDFBF7',
+                            card: '#FFFDF9',
+                            primary: '#8C6A50',
+                            accent: '#E6A15C',
+                            green: '#8AA683',
+                            pink: '#E8A399',
+                            yellow: '#F4D068',
+                            soft: '#FAF3E0',
+                            shepherd: '#6B8E23', // 목자 색상 (올리브그린)
+                            sheep: '#DDA0DD'     // 양 색상 (파스텔 바이올렛)
+                        }
+                    },
+                    fontFamily: {
+                        gowun: ['Gowun Dodum', 'sans-serif'],
+                        sans: ['Noto Sans KR', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
+            background-color: #FDFBF7;
+            color: #4A3E3D;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .sticker-pop {
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            80% { transform: scale(1.25) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #FAF3E0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E6A15C;
+            border-radius: 10px;
+        }
+        .glass-card {
+            background: rgba(255, 253, 249, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(230, 161, 92, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between pb-10">
+
+    <!-- Header Area -->
+    <header class="sticky top-0 z-30 bg-cozy-bg/95 backdrop-blur-md border-b border-cozy-accent/20 px-4 py-3">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-full bg-cozy-yellow/40 flex items-center justify-center text-xl shadow-sm border border-cozy-accent/30">
+                    🐑
+                </div>
+                <div>
+                    <h1 class="text-base font-bold text-cozy-primary leading-tight flex items-center gap-1">
+                        목자와 양 큐티 동행
+                    </h1>
+                    <p class="text-[11px] text-cozy-primary/70">2인 1조 함께하는 말씀 칭찬판</p>
+                </div>
+            </div>
+            <button onclick="openManageModal()" class="px-3 py-1.5 rounded-full bg-cozy-soft hover:bg-cozy-accent/20 text-cozy-primary text-xs font-bold transition flex items-center gap-1.5 border border-cozy-accent/30 shadow-sm">
+                <i class="fa-solid fa-users-gear text-cozy-accent"></i> 조 관리
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-md mx-auto w-full px-4 pt-4 flex-1 space-y-4">
+
+        <!-- Today's Passage & Verse Edit Section -->
+        <section class="glass-card rounded-2xl p-4 shadow-sm border border-cozy-accent/20 relative overflow-hidden space-y-2">
+            <div class="flex justify-between items-center border-b border-cozy-accent/15 pb-2">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-cozy-accent">
+                    <i class="fa-solid fa-book-bible text-base"></i>
+                    <span>오늘의 큐티 본문</span>
+                </div>
+                <button onclick="toggleVerseEditModal()" class="text-[11px] px-2 py-0.5 rounded-md bg-cozy-soft text-cozy-primary hover:bg-cozy-accent hover:text-white border border-cozy-accent/30 transition flex items-center gap-1">
+                    <i class="fa-solid fa-pen-to-square"></i> 본문 수정
+                </button>
+            </div>
+
+            <!-- Passage Display -->
+            <div id="passageDisplayContainer" class="pt-1">
+                <div class="flex items-baseline justify-between">
+                    <span id="passageRange" class="text-base font-bold text-cozy-primary tracking-tight">
+                        시편 23편 1~6절
+                    </span>
+                    <span id="qtBookTitle" class="text-xs px-2 py-0.5 rounded-full bg-cozy-yellow/30 font-semibold text-cozy-primary/80">
+                        매일성경
+                    </span>
+                </div>
+                <p id="verseText" class="text-xs font-medium text-cozy-primary/80 leading-relaxed mt-1.5 italic bg-cozy-soft/50 p-2.5 rounded-xl border border-cozy-accent/10">
+                    "여호와는 나의 목자시니 내게 부족함이 없으리로다"
+                </p>
+            </div>
+        </section>
+
+        <!-- Date Selector & Quick Controls -->
+        <section class="space-y-3">
+            <div class="flex items-center justify-between bg-cozy-soft/80 p-2.5 rounded-xl border border-cozy-accent/20">
+                <div class="flex items-center gap-2">
+                    <i class="fa-regular fa-calendar-days text-cozy-accent text-base"></i>
+                    <input type="date" id="selectedDate" onchange="handleDateChange()" class="bg-white/90 border border-cozy-accent/30 text-cozy-primary text-xs rounded-lg px-2.5 py-1 font-bold focus:outline-none focus:ring-1 focus:ring-cozy-accent cursor-pointer shadow-sm">
+                </div>
+                
+                <button onclick="resetDateToToday()" class="bg-white text-cozy-primary hover:bg-cozy-soft border border-cozy-accent/30 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-sm">
+                    <i class="fa-solid fa-rotate-left text-cozy-accent"></i> 오늘
+                </button>
+            </div>
+
+            <!-- Pair Tabs -->
+            <div class="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1" id="pairTabContainer">
+                <!-- Dynamic Pair Tabs loaded here -->
+            </div>
+        </section>
+
+        <!-- Pair Board (Shepherd & Sheep Interaction) -->
+        <section class="bg-cozy-card rounded-2xl p-4 shadow-sm border border-cozy-accent/20 space-y-4">
+            <!-- Header Status -->
+            <div class="flex justify-between items-center border-b border-cozy-soft pb-2.5">
+                <div>
+                    <h2 id="currentPairTitle" class="text-base font-bold text-cozy-primary flex items-center gap-1.5">
+                        <i class="fa-solid fa-heart-pulse text-cozy-pink"></i> 1조 (목자 & 양)
+                    </h2>
+                    <p class="text-[11px] text-cozy-primary/60 mt-0.5">두 사람 모두 인증 시 스티커가 붙습니다!</p>
+                </div>
+
+                <!-- Sticker Selection -->
+                <div class="flex items-center gap-1 text-xs text-cozy-primary/70">
+                    <label for="selectedStickerType" class="text-[11px]">스티커:</label>
+                    <select id="selectedStickerType" onchange="savePreferredSticker()" class="bg-cozy-soft border border-cozy-accent/20 rounded-lg px-1.5 py-1 text-xs font-bold text-cozy-primary focus:outline-none">
+                        <option value="🐑">🐑 양</option>
+                        <option value="✝️">✝️ 십자가</option>
+                        <option value="📖">📖 성경</option>
+                        <option value="💛">💛 하트</option>
+                        <option value="👑">👑 면류관</option>
+                        <option value="🌿">🌿 싹</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Interactive Buttons Container -->
+            <div class="grid grid-cols-2 gap-3" id="pairInteractionContainer">
+                <!-- Shepherd Button -->
+                <!-- Sheep Button -->
+            </div>
+
+            <!-- Completion Banner Result -->
+            <div id="pairStatusBanner" class="text-center p-3 rounded-xl transition-all">
+                <!-- Status text updated dynamically -->
+            </div>
+        </section>
+
+        <!-- Visual Progress & Cumulative Sticker Board -->
+        <section class="bg-cozy-card rounded-2xl p-4 shadow-sm border border-cozy-accent/20 space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="text-sm font-bold text-cozy-primary flex items-center gap-1.5">
+                    <i class="fa-solid fa-crown text-cozy-yellow"></i>
+                    <span>이번 달 함께 모은 스티커</span>
+                </h3>
+                <span id="totalRateText" class="text-xs font-bold text-cozy-accent">최근 15일: 0개 완료</span>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-cozy-soft h-3.5 rounded-full overflow-hidden p-0.5 border border-cozy-accent/20">
+                <div id="progressBar" class="bg-gradient-to-r from-cozy-yellow via-cozy-accent to-cozy-green h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+
+            <!-- Message Banner -->
+            <div id="encouragementMsg" class="bg-cozy-yellow/20 rounded-xl p-2.5 text-xs text-center font-bold text-cozy-primary border border-cozy-yellow/40">
+                🌱 목자와 양이 손잡고 매일 말씀으로 걸어가요!
+            </div>
+
+            <!-- Cumulative Board Grid -->
+            <div class="mt-2 pt-2 border-t border-cozy-soft">
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-xs font-bold text-cozy-primary/70">완성된 스티커판 <span class="text-[10px] text-cozy-primary/50">(최근 15일 동행)</span></p>
+                    <button onclick="shareCompletionCard()" class="text-xs text-cozy-accent font-bold hover:underline flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> 응원 카드 공유
+                    </button>
+                </div>
+
+                <div id="cumulativeStickerGrid" class="bg-cozy-soft/40 p-3 rounded-xl border border-cozy-accent/10 grid grid-cols-5 gap-2 min-h-[130px] items-center justify-items-center">
+                    <!-- Dynamic Stickers Grid -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Passage Input / Edit Modal -->
+    <div id="verseModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cozy-card w-full max-w-sm rounded-2xl shadow-xl border border-cozy-accent/30 p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-cozy-soft pb-2">
+                <h3 class="font-bold text-cozy-primary text-base flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open text-cozy-accent"></i> 오늘/선택일 큐티 본문 설정
+                </h3>
+                <button onclick="toggleVerseEditModal()" class="text-cozy-primary/50 hover:text-cozy-primary text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold text-cozy-primary block mb-1">큐티 교재 / 제목</label>
+                    <input type="text" id="inputQtBook" placeholder="예: 매일성경, 생명의 삶" class="w-full text-xs border border-cozy-accent/30 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cozy-accent">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-cozy-primary block mb-1">성경 장/절 범위</label>
+                    <input type="text" id="inputQtRange" placeholder="예: 요한복음 15장 1~8절" class="w-full text-xs border border-cozy-accent/30 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cozy-accent">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-cozy-primary block mb-1">오늘의 요절 한 구절</label>
+                    <textarea id="inputQtVerse" rows="3" placeholder="예: 나는 포도나무요 너희는 가지라..." class="w-full text-xs border border-cozy-accent/30 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-cozy-accent resize-none"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="saveVerseInfo()" class="flex-1 bg-cozy-accent text-white py-2 rounded-xl text-xs font-bold shadow hover:bg-cozy-accent/90 transition">
+                    저장하기
+                </button>
+                <button onclick="toggleVerseEditModal()" class="bg-cozy-soft text-cozy-primary px-4 py-2 rounded-xl text-xs font-bold border border-cozy-accent/20">
+                    취소
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pair & Member Settings Modal -->
+    <div id="manageModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cozy-card w-full max-w-sm rounded-2xl shadow-xl border border-cozy-accent/30 p-5 space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center border-b border-cozy-soft pb-2">
+                <h3 class="font-bold text-cozy-primary text-base flex items-center gap-1.5">
+                    <i class="fa-solid fa-users-gear text-cozy-accent"></i> 2인 1조(목자 & 양) 관리
+                </h3>
+                <button onclick="closeManageModal()" class="text-cozy-primary/50 hover:text-cozy-primary text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Add Pair Form -->
+            <div class="space-y-2 bg-cozy-soft/50 p-3 rounded-xl border border-cozy-accent/20">
+                <label class="text-xs font-bold text-cozy-primary block">새로운 2인 1조 추가</label>
+                <input type="text" id="newPairTitleInput" placeholder="조 이름 (예: 3조 사랑조)" class="w-full text-xs border border-cozy-accent/30 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none mb-1.5">
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div>
+                        <span class="text-[10px] text-cozy-primary/70 block">목자 이름</span>
+                        <input type="text" id="newShepherdInput" placeholder="목자 이름" class="w-full text-xs border border-cozy-accent/30 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none">
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-cozy-primary/70 block">양 이름</span>
+                        <input type="text" id="newSheepInput" placeholder="양 이름" class="w-full text-xs border border-cozy-accent/30 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none">
+                    </div>
+                </div>
+                <button onclick="addPairGroup()" class="w-full bg-cozy-accent text-white py-1.5 rounded-lg text-xs font-bold hover:bg-cozy-accent/90 transition shadow-sm">
+                    + 새로운 조 추가하기
+                </button>
+            </div>
+
+            <!-- Existing Pairs List -->
+            <div class="space-y-2.5 pt-1">
+                <label class="text-xs font-bold text-cozy-primary block">현재 등록된 2인 1조</label>
+                <div id="pairManagementList" class="space-y-2.5">
+                    <!-- Dynamic Pair Management Items -->
+                </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeManageModal()" class="w-full bg-cozy-primary text-white py-2 rounded-xl text-xs font-bold shadow hover:bg-cozy-primary/90 transition">
+                    설정 완료
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration Share Card Modal -->
+    <div id="shareModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-cozy-card w-full max-w-xs rounded-2xl shadow-2xl border-2 border-cozy-yellow p-5 text-center space-y-4">
+            <div id="shareCardContent" class="space-y-3 bg-cozy-soft p-4 rounded-xl border border-cozy-accent/20">
+                <div class="text-3xl">🐑✨✝️</div>
+                <h4 class="text-base font-bold text-cozy-primary" id="sharePairName">1조 목자와 양 동행</h4>
+                <p class="text-xs text-cozy-primary/80" id="shareStats">최근 스티커 달성: 12개 완성!</p>
+                <div class="py-2 text-2xl flex justify-center gap-1 flex-wrap" id="shareStickerPreview">
+                    🐑✝️📖💛👑🐑✝️📖
+                </div>
+                <p class="text-[11px] text-cozy-primary/70 italic" id="shareVerseText">"여호와는 나의 목자시니 내게 부족함이 없으리로다"</p>
+            </div>
+            
+            <p class="text-xs text-cozy-primary/70">목자와 양의 동행 축하 문구를 복사해보세요!</p>
+            
+            <div class="flex gap-2">
+                <button onclick="copyShareText()" class="flex-1 bg-cozy-accent text-white py-2 rounded-xl text-xs font-bold shadow hover:bg-cozy-accent/90 transition flex items-center justify-center gap-1">
+                    <i class="fa-regular fa-copy"></i> 응원문구 복사
+                </button>
+                <button onclick="closeShareModal()" class="bg-cozy-soft text-cozy-primary border border-cozy-accent/30 px-3 py-2 rounded-xl text-xs font-bold">
+                    닫기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-cozy-primary text-white text-xs px-4 py-2.5 rounded-full shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-cozy-yellow"></i>
+        <span id="toastMsg">인증이 반영되었습니다!</span>
+    </div>
+
+    <script>
+        // Default Sample Data Structure
+        const DEFAULT_DATA = {
+            pairs: [
+                {
+                    id: 'pair_1',
+                    name: '1조 (사랑조)',
+                    shepherd: '김목자',
+                    sheep: '이양'
+                },
+                {
+                    id: 'pair_2',
+                    name: '2조 (소망조)',
+                    shepherd: '박은혜',
+                    sheep: '최순종'
+                }
+            ],
+            // Check Records format: { "YYYY-MM-DD": { "pair_1": { shepherd: true, sheep: false } } }
+            records: {},
+            // Daily Passages format: { "YYYY-MM-DD": { book: "매일성경", range: "시편 23:1-6", verse: "여호와는 나의 목자시니 내게 부족함이 없으리로다" } }
+            passages: {},
+            preferredSticker: '🐑'
+        };
+
+        // Default Scriptures list for auto-fill on new dates
+        const DEFAULT_VERSES = [
+            { book: "매일성경", range: "시편 23편 1~6절", verse: "여호와는 나의 목자시니 내게 부족함이 없으리로다" },
+            { book: "매일성경", range: "요한복음 15장 1~8절", verse: "나는 포도나무요 너희는 가지라 그가 내 안에, 내가 그 안에 거하면 사람이 열매를 많이 맺나니" },
+            { book: "매일성경", range: "시편 119편 105절", verse: "주의 말씀은 내 발에 등이요 내 길에 빛이니이다" },
+            { book: "매일성경", range: "빌립보서 4장 12~13절", verse: "내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라" },
+            { book: "매일성경", range: "잠언 3장 5~6절", verse: "너는 마음을 다하여 여호와를 신뢰하고 네 명철을 의지하지 말라" }
+        ];
+
+        let appData = DEFAULT_DATA;
+        let currentPairId = 'pair_1';
+        let currentDateStr = getTodayStr();
+
+        window.onload = function() {
+            loadLocalData();
+            initDateInput();
+            ensurePassageForDate(currentDateStr);
+            renderPassageInfo();
+            renderPairTabs();
+            renderCurrentPairBoard();
+            renderCumulativeBoard();
+        };
+
+        function getTodayStr() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function loadLocalData() {
+            const saved = localStorage.getItem('qt_pair_sticker_data');
+            if (saved) {
+                try {
+                    appData = JSON.parse(saved);
+                } catch(e) {
+                    console.error("Local data parse error", e);
+                }
+            } else {
+                saveData();
+            }
+            if (appData.preferredSticker) {
+                document.getElementById('selectedStickerType').value = appData.preferredSticker;
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('qt_pair_sticker_data', JSON.stringify(appData));
+        }
+
+        function initDateInput() {
+            const dateInput = document.getElementById('selectedDate');
+            dateInput.value = currentDateStr;
+        }
+
+        function handleDateChange() {
+            const dateInput = document.getElementById('selectedDate');
+            currentDateStr = dateInput.value || getTodayStr();
+            ensurePassageForDate(currentDateStr);
+            renderPassageInfo();
+            renderCurrentPairBoard();
+            renderCumulativeBoard();
+        }
+
+        function resetDateToToday() {
+            currentDateStr = getTodayStr();
+            document.getElementById('selectedDate').value = currentDateStr;
+            ensurePassageForDate(currentDateStr);
+            renderPassageInfo();
+            renderCurrentPairBoard();
+            renderCumulativeBoard();
+            showToast('오늘 날짜로 이동했습니다!');
+        }
+
+        function savePreferredSticker() {
+            const sticker = document.getElementById('selectedStickerType').value;
+            appData.preferredSticker = sticker;
+            saveData();
+            renderCurrentPairBoard();
+            renderCumulativeBoard();
+        }
+
+        function ensurePassageForDate(dateStr) {
+            if (!appData.passages) appData.passages = {};
+            if (!appData.passages[dateStr]) {
+                // Pick a default scripture pseudo-randomly based on date
+                const dateNum = parseInt(dateStr.replace(/-/g, ''), 10) || 0;
+                const verseObj = DEFAULT_VERSES[dateNum % DEFAULT_VERSES.length];
+                appData.passages[dateStr] = { ...verseObj };
+                saveData();
+            }
+        }
+
+        function renderPassageInfo() {
+            const currentPassage = appData.passages[currentDateStr] || DEFAULT_VERSES[0];
+            document.getElementById('qtBookTitle').innerText = currentPassage.book || '큐티본문';
+            document.getElementById('passageRange').innerText = currentPassage.range || '본문 장절 미설정';
+            document.getElementById('verseText').innerText = `"${currentPassage.verse || '말씀을 입력해 주세요.'}"`;
+        }
+
+        function toggleVerseEditModal() {
+            const modal = document.getElementById('verseModal');
+            if (modal.classList.contains('hidden')) {
+                const currentPassage = appData.passages[currentDateStr] || DEFAULT_VERSES[0];
+                document.getElementById('inputQtBook').value = currentPassage.book || '';
+                document.getElementById('inputQtRange').value = currentPassage.range || '';
+                document.getElementById('inputQtVerse').value = currentPassage.verse || '';
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function saveVerseInfo() {
+            const book = document.getElementById('inputQtBook').value.trim();
+            const range = document.getElementById('inputQtRange').value.trim();
+            const verse = document.getElementById('inputQtVerse').value.trim();
+
+            if (!range) {
+                showToast('성경 장/절 범위를 입력해주세요!');
+                return;
+            }
+
+            if (!appData.passages) appData.passages = {};
+            appData.passages[currentDateStr] = {
+                book: book || '큐티',
+                range: range,
+                verse: verse || ''
+            };
+
+            saveData();
+            renderPassageInfo();
+            toggleVerseEditModal();
+            showToast('큐티 본문 말씀이 변경되었습니다 ✨');
+        }
+
+        function renderPairTabs() {
+            const container = document.getElementById('pairTabContainer');
+            container.innerHTML = '';
+
+            appData.pairs.forEach(pair => {
+                const isActive = pair.id === currentPairId;
+                const tabBtn = document.createElement('button');
+                tabBtn.className = `px-3 py-1.5 rounded-full text-xs font-bold transition whitespace-nowrap border ${
+                    isActive 
+                    ? 'bg-cozy-accent text-white border-cozy-accent shadow-sm' 
+                    : 'bg-cozy-soft/80 text-cozy-primary hover:bg-cozy-soft border-cozy-accent/20'
+                }`;
+                tabBtn.innerText = pair.name;
+                tabBtn.onclick = () => {
+                    currentPairId = pair.id;
+                    renderPairTabs();
+                    renderCurrentPairBoard();
+                    renderCumulativeBoard();
+                };
+                container.appendChild(tabBtn);
+            });
+        }
+
+        function renderCurrentPairBoard() {
+            const pair = appData.pairs.find(p => p.id === currentPairId);
+            if (!pair) return;
+
+            document.getElementById('currentPairTitle').innerHTML = `
+                <i class="fa-solid fa-heart-pulse text-cozy-pink"></i> ${pair.name}
+            `;
+
+            const container = document.getElementById('pairInteractionContainer');
+            container.innerHTML = '';
+
+            // Get check status for current date and pair
+            const dayRecord = (appData.records[currentDateStr] && appData.records[currentDateStr][currentPairId]) 
+                ? appData.records[currentDateStr][currentPairId] 
+                : { shepherd: false, sheep: false };
+
+            const isShepherdDone = !!dayRecord.shepherd;
+            const isSheepDone = !!dayRecord.sheep;
+            const isBothDone = isShepherdDone && isSheepDone;
+
+            // Render Shepherd Button Card
+            const shepherdCard = document.createElement('div');
+            shepherdCard.className = `p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-2 text-center select-none ${
+                isShepherdDone 
+                ? 'bg-cozy-yellow/20 border-cozy-accent text-cozy-primary shadow-sm' 
+                : 'bg-white border-cozy-soft hover:border-cozy-accent/40 text-cozy-primary/60'
+            }`;
+            shepherdCard.onclick = () => toggleCheck('shepherd');
+            shepherdCard.innerHTML = `
+                <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-cozy-accent/15 text-cozy-accent">목자</span>
+                <div class="text-3xl my-1">
+                    ${isShepherdDone ? '<i class="fa-solid fa-circle-check text-cozy-accent"></i>' : '<i class="fa-regular fa-circle text-gray-300"></i>'}
+                </div>
+                <div class="font-bold text-xs ${isShepherdDone ? 'text-cozy-primary' : 'text-cozy-primary/70'}">
+                    ${pair.shepherd || '목자'}
+                </div>
+                <span class="text-[10px] ${isShepherdDone ? 'text-cozy-accent font-bold' : 'text-gray-400'}">
+                    ${isShepherdDone ? '큐티 완료!' : '터치하여 인증'}
+                </span>
+            `;
+
+            // Render Sheep Button Card
+            const sheepCard = document.createElement('div');
+            sheepCard.className = `p-4 rounded-2xl border-2 transition-all cursor-pointer flex flex-col items-center justify-center gap-2 text-center select-none ${
+                isSheepDone 
+                ? 'bg-cozy-yellow/20 border-cozy-accent text-cozy-primary shadow-sm' 
+                : 'bg-white border-cozy-soft hover:border-cozy-accent/40 text-cozy-primary/60'
+            }`;
+            sheepCard.onclick = () => toggleCheck('sheep');
+            sheepCard.innerHTML = `
+                <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-cozy-pink/20 text-cozy-pink">양</span>
+                <div class="text-3xl my-1">
+                    ${isSheepDone ? '<i class="fa-solid fa-circle-check text-cozy-accent"></i>' : '<i class="fa-regular fa-circle text-gray-300"></i>'}
+                </div>
+                <div class="font-bold text-xs ${isSheepDone ? 'text-cozy-primary' : 'text-cozy-primary/70'}">
+                    ${pair.sheep || '양'}
+                </div>
+                <span class="text-[10px] ${isSheepDone ? 'text-cozy-accent font-bold' : 'text-gray-400'}">
+                    ${isSheepDone ? '큐티 완료!' : '터치하여 인증'}
+                </span>
+            `;
+
+            container.appendChild(shepherdCard);
+            container.appendChild(sheepCard);
+
+            // Update Pair Overall Status Banner
+            const banner = document.getElementById('pairStatusBanner');
+            const sticker = appData.preferredSticker || '🐑';
+
+            if (isBothDone) {
+                banner.className = 'text-center p-3.5 rounded-xl bg-cozy-green/20 border border-cozy-green/40 text-cozy-primary space-y-1';
+                banner.innerHTML = `
+                    <div class="text-3xl sticker-pop inline-block mb-1">${sticker}</div>
+                    <div class="text-xs font-bold text-cozy-green">🎉 스티커 완성! (${pair.shepherd} & ${pair.sheep})</div>
+                    <p class="text-[11px] text-cozy-primary/80">두 분 다 오늘의 큐티를 완수하여 스티커가 붙었습니다!</p>
+                `;
+            } else if (isShepherdDone || isSheepDone) {
+                const waitingWho = isShepherdDone ? pair.sheep : pair.shepherd;
+                const doneWho = isShepherdDone ? pair.shepherd : pair.sheep;
+                banner.className = 'text-center p-3 rounded-xl bg-cozy-yellow/20 border border-cozy-yellow/50 text-cozy-primary space-y-0.5';
+                banner.innerHTML = `
+                    <div class="text-xs font-bold text-cozy-accent">⏳ 동행 대기 중... (${doneWho} 완료)</div>
+                    <p class="text-[11px] text-cozy-primary/70"><b>${waitingWho}</b> 님만 완료하면 오늘의 스티커가 부착됩니다!</p>
+                `;
+            } else {
+                banner.className = 'text-center p-3 rounded-xl bg-cozy-soft/60 border border-cozy-accent/10 text-cozy-primary/70';
+                banner.innerHTML = `
+                    <div class="text-xs font-bold">🌱 아직 스티커 전이에요</div>
+                    <p class="text-[11px] text-cozy-primary/60">목자와 양 모두 자신의 이름을 터치하여 완료해주세요.</p>
+                `;
+            }
+        }
+
+        function toggleCheck(role) {
+            if (!appData.records[currentDateStr]) {
+                appData.records[currentDateStr] = {};
+            }
+            if (!appData.records[currentDateStr][currentPairId]) {
+                appData.records[currentDateStr][currentPairId] = { shepherd: false, sheep: false };
+            }
+
+            const currentRecord = appData.records[currentDateStr][currentPairId];
+            const pair = appData.pairs.find(p => p.id === currentPairId);
+            const roleName = role === 'shepherd' ? pair.shepherd : pair.sheep;
+
+            currentRecord[role] = !currentRecord[role];
+
+            // Check if this action triggers double check completion
+            if (currentRecord.shepherd && currentRecord.sheep) {
+                showToast(`🎉 축하합니다! ${pair.shepherd} & ${pair.sheep} 스티커 완성!`);
+                confetti({
+                    particleCount: 45,
+                    spread: 60,
+                    origin: { y: 0.65 },
+                    colors: ['#E6A15C', '#F4D068', '#8AA683']
+                });
+            } else if (currentRecord[role]) {
+                showToast(`${roleName} 님 큐티 체크 완료! 상대방 기다리는 중...`);
+            } else {
+                showToast(`${roleName} 님의 체크가 취소되었습니다.`);
+            }
+
+            saveData();
+            renderCurrentPairBoard();
+            renderCumulativeBoard();
+        }
+
+        function renderCumulativeBoard() {
+            const pair = appData.pairs.find(p => p.id === currentPairId);
+            if (!pair) return;
+
+            const daysToTrack = 15;
+            let completedCount = 0;
+            let collectedStickers = [];
+
+            const today = new Date(currentDateStr);
+
+            for (let i = 0; i < daysToTrack; i++) {
+                const d = new Date(today);
+                d.setDate(d.getDate() - i);
+                const yyyy = d.getFullYear();
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                const dStr = `${yyyy}-${mm}-${dd}`;
+
+                const rec = appData.records[dStr] && appData.records[dStr][currentPairId];
+                if (rec && rec.shepherd && rec.sheep) {
+                    completedCount++;
+                    collectedStickers.push(appData.preferredSticker || '🐑');
+                }
+            }
+
+            const rate = Math.round((completedCount / daysToTrack) * 100);
+            document.getElementById('totalRateText').innerText = `최근 15일: ${completedCount}개 완성 (${rate}%)`;
+            document.getElementById('progressBar').style.width = `${Math.min(rate, 100)}%`;
+
+            const encMsg = document.getElementById('encouragementMsg');
+            if (completedCount >= 12) {
+                encMsg.innerText = "🔥 최고예요! 목자와 양이 하나 되어 은혜가 풍성합니다!";
+            } else if (completedCount >= 7) {
+                encMsg.innerText = "🌿 서로 이끌어주며 매일 말씀으로 깊어지고 있네요!";
+            } else {
+                encMsg.innerText = "🌱 차근차근 서로를 위해 기도하며 오늘 말씀으로 함께해요!";
+            }
+
+            // Render 15 Display Slots Grid
+            const gridContainer = document.getElementById('cumulativeStickerGrid');
+            gridContainer.innerHTML = '';
+
+            for (let i = 0; i < daysToTrack; i++) {
+                const slot = document.createElement('div');
+
+                if (i < collectedStickers.length) {
+                    slot.className = 'w-10 h-10 rounded-full bg-cozy-yellow/30 border border-cozy-accent/40 flex items-center justify-center text-xl shadow-sm sticker-pop';
+                    slot.innerText = collectedStickers[i];
+                } else {
+                    slot.className = 'w-10 h-10 rounded-full border border-dashed border-cozy-accent/30 bg-white/60 flex items-center justify-center text-xs text-cozy-primary/30';
+                    slot.innerText = i + 1;
+                }
+
+                gridContainer.appendChild(slot);
+            }
+        }
+
+        function openManageModal() {
+            renderPairManagement();
+            document.getElementById('manageModal').classList.remove('hidden');
+        }
+
+        function closeManageModal() {
+            document.getElementById('manageModal').classList.add('hidden');
+        }
+
+        function renderPairManagement() {
+            const listContainer = document.getElementById('pairManagementList');
+            listContainer.innerHTML = '';
+
+            appData.pairs.forEach((pair) => {
+                const pairBox = document.createElement('div');
+                pairBox.className = 'bg-cozy-soft/50 p-3 rounded-xl border border-cozy-accent/20 space-y-2';
+
+                pairBox.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-cozy-accent/15 pb-1.5">
+                        <input type="text" value="${pair.name}" onchange="updatePairName('${pair.id}', this.value)" class="text-xs font-bold text-cozy-primary bg-transparent border-b border-cozy-accent/30 focus:outline-none focus:border-cozy-accent">
+                        <button onclick="deletePairGroup('${pair.id}')" class="text-xs text-cozy-pink hover:underline">
+                            <i class="fa-regular fa-trash-can"></i> 삭제
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <span class="text-[10px] text-cozy-primary/60 block">목자</span>
+                            <input type="text" value="${pair.shepherd}" onchange="updateMemberRole('${pair.id}', 'shepherd', this.value)" class="w-full text-xs bg-white px-2 py-1 border border-cozy-accent/20 rounded focus:outline-none">
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-cozy-primary/60 block">양</span>
+                            <input type="text" value="${pair.sheep}" onchange="updateMemberRole('${pair.id}', 'sheep', this.value)" class="w-full text-xs bg-white px-2 py-1 border border-cozy-accent/20 rounded focus:outline-none">
+                        </div>
+                    </div>
+                `;
+
+                listContainer.appendChild(pairBox);
+            });
+        }
+
+        function addPairGroup() {
+            const nameInput = document.getElementById('newPairTitleInput');
+            const shepherdInput = document.getElementById('newShepherdInput');
+            const sheepInput = document.getElementById('newSheepInput');
+
+            const name = nameInput.value.trim();
+            const shepherd = shepherdInput.value.trim();
+            const sheep = sheepInput.value.trim();
+
+            if (!name || !shepherd || !sheep) {
+                showToast('조 이름, 목자 이름, 양 이름을 모두 입력해주세요.');
+                return;
+            }
+
+            const newId = 'pair_' + Date.now();
+            appData.pairs.push({
+                id: newId,
+                name: name,
+                shepherd: shepherd,
+                sheep: sheep
+            });
+
+            nameInput.value = '';
+            shepherdInput.value = '';
+            sheepInput.value = '';
+
+            saveData();
+            renderPairManagement();
+            renderPairTabs();
+            renderCurrentPairBoard();
+            renderCumulativeBoard();
+            showToast('새로운 2인 1조가 등록되었습니다!');
+        }
+
+        function updatePairName(pairId, newName) {
+            const pair = appData.pairs.find(p => p.id === pairId);
+            if (pair && newName.trim()) {
+                pair.name = newName.trim();
+                saveData();
+                renderPairTabs();
+                renderCurrentPairBoard();
+            }
+        }
+
+        function updateMemberRole(pairId, role, newName) {
+            const pair = appData.pairs.find(p => p.id === pairId);
+            if (pair && newName.trim()) {
+                pair[role] = newName.trim();
+                saveData();
+                renderCurrentPairBoard();
+            }
+        }
+
+        function deletePairGroup(pairId) {
+            if (appData.pairs.length <= 1) {
+                showToast('최소 1개의 조는 유지되어야 합니다.');
+                return;
+            }
+            if (confirm('이 조를 정말 삭제하시겠습니까? 관련된 체크 기록이 정리됩니다.')) {
+                appData.pairs = appData.pairs.filter(p => p.id !== pairId);
+                if (currentPairId === pairId) {
+                    currentPairId = appData.pairs[0].id;
+                }
+                saveData();
+                renderPairManagement();
+                renderPairTabs();
+                renderCurrentPairBoard();
+                renderCumulativeBoard();
+                showToast('조가 삭제되었습니다.');
+            }
+        }
+
+        function shareCompletionCard() {
+            const pair = appData.pairs.find(p => p.id === currentPairId);
+            if (!pair) return;
+
+            document.getElementById('sharePairName').innerText = `${pair.name} (${pair.shepherd} & ${pair.sheep})`;
+            const rateText = document.getElementById('totalRateText').innerText;
+            document.getElementById('shareStats').innerText = rateText;
+
+            const currentPassage = appData.passages[currentDateStr] || DEFAULT_VERSES[0];
+            document.getElementById('shareVerseText').innerText = `"${currentPassage.verse || currentPassage.range}"`;
+
+            const preview = document.getElementById('shareStickerPreview');
+            const sticker = appData.preferredSticker || '🐑';
+            preview.innerText = `${sticker}✝️📖💛👑${sticker}✝️📖`;
+
+            document.getElementById('shareModal').classList.remove('hidden');
+
+            confetti({
+                particleCount: 50,
+                spread: 60,
+                origin: { y: 0.5 }
+            });
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        function copyShareText() {
+            const pair = appData.pairs.find(p => p.id === currentPairId);
+            const currentPassage = appData.passages[currentDateStr] || DEFAULT_VERSES[0];
+            const textToCopy = `[${pair ? pair.name : '동아리'} 목자와 양 큐티 동행 🐑✨]\n목자: ${pair ? pair.shepherd : ''} / 양: ${pair ? pair.sheep : ''}\n오늘의 말씀: ${currentPassage.range}\n"${currentPassage.verse}"\n우리 함께 말씀으로 동행해요! 💛`;
+
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            showToast('동행 응원 문구가 복사되었습니다!');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 2300);
+        }
+    </script>
+</body>
+</html>
